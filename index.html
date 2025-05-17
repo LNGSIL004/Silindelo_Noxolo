@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="data/Wards_1.js"></script>
+        <script src="data/coct_2.js"></script>
+        <script src="data/Population_3.js"></script>
+        <script src="data/Numberofcrime_4.js"></script>
+        <script src="data/Intersections_5.js"></script>
+        <script src="data/CPbuildingoffices_6.js"></script>
+        <script src="data/Crimefocus_7.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[-34.41522480121437,18.12900083987292],[-33.44922465385189,19.8395945074159]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_OpenStreetMap_0');
+        map.getPane('pane_OpenStreetMap_0').style.zIndex = 400;
+        var layer_OpenStreetMap_0 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'pane_OpenStreetMap_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OpenStreetMap_0;
+        map.addLayer(layer_OpenStreetMap_0);
+        function pop_Wards_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">WARD_NAME</th>\
+                        <td class="visible-with-data" id="WARD_NAME">' + (feature.properties['WARD_NAME'] !== null ? autolinker.link(String(feature.properties['WARD_NAME']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">WARD_YEAR</th>\
+                        <td class="visible-with-data" id="WARD_YEAR">' + (feature.properties['WARD_YEAR'] !== null ? autolinker.link(String(feature.properties['WARD_YEAR']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Wards_1_0() {
+            return {
+                pane: 'pane_Wards_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(253,191,111,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Wards_1');
+        map.getPane('pane_Wards_1').style.zIndex = 401;
+        map.getPane('pane_Wards_1').style['mix-blend-mode'] = 'normal';
+        var layer_Wards_1 = new L.geoJson(json_Wards_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Wards_1',
+            layerName: 'layer_Wards_1',
+            pane: 'pane_Wards_1',
+            onEachFeature: pop_Wards_1,
+            style: style_Wards_1_0,
+        });
+        bounds_group.addLayer(layer_Wards_1);
+        map.addLayer(layer_Wards_1);
+        function pop_coct_2(feature, layer) {
+            var popupContent = '<table>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_coct_2_0() {
+            return {
+                pane: 'pane_coct_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 4.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,234,0,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_coct_2');
+        map.getPane('pane_coct_2').style.zIndex = 402;
+        map.getPane('pane_coct_2').style['mix-blend-mode'] = 'normal';
+        var layer_coct_2 = new L.geoJson(json_coct_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_coct_2',
+            layerName: 'layer_coct_2',
+            pane: 'pane_coct_2',
+            onEachFeature: pop_coct_2,
+            style: style_coct_2_0,
+        });
+        bounds_group.addLayer(layer_coct_2);
+        map.addLayer(layer_coct_2);
+        function pop_Population_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">WARD_NAME</th>\
+                        <td class="visible-with-data" id="WARD_NAME">' + (feature.properties['WARD_NAME'] !== null ? autolinker.link(String(feature.properties['WARD_NAME']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">WARD_YEAR</th>\
+                        <td class="visible-with-data" id="WARD_YEAR">' + (feature.properties['WARD_YEAR'] !== null ? autolinker.link(String(feature.properties['WARD_YEAR']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">No_crime</th>\
+                        <td class="visible-with-data" id="No_crime">' + (feature.properties['No_crime'] !== null ? autolinker.link(String(feature.properties['No_crime']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Total_Pop</th>\
+                        <td class="visible-with-data" id="Total_Pop">' + (feature.properties['Total_Pop'] !== null ? autolinker.link(String(feature.properties['Total_Pop']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Population_3_0(feature) {
+            if (feature.properties['Total_Pop'] >= 0.000000 && feature.properties['Total_Pop'] <= 100.000000 ) {
+                return {
+                pane: 'pane_Population_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(247,252,245,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Total_Pop'] >= 100.000000 && feature.properties['Total_Pop'] <= 574.000000 ) {
+                return {
+                pane: 'pane_Population_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(202,234,195,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Total_Pop'] >= 574.000000 && feature.properties['Total_Pop'] <= 1144.000000 ) {
+                return {
+                pane: 'pane_Population_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(123,200,124,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Total_Pop'] >= 1144.000000 && feature.properties['Total_Pop'] <= 4350.000000 ) {
+                return {
+                pane: 'pane_Population_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(42,146,74,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Total_Pop'] >= 4350.000000 && feature.properties['Total_Pop'] <= 32259.000000 ) {
+                return {
+                pane: 'pane_Population_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,68,27,1.0)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_Population_3');
+        map.getPane('pane_Population_3').style.zIndex = 403;
+        map.getPane('pane_Population_3').style['mix-blend-mode'] = 'normal';
+        var layer_Population_3 = new L.geoJson(json_Population_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Population_3',
+            layerName: 'layer_Population_3',
+            pane: 'pane_Population_3',
+            onEachFeature: pop_Population_3,
+            style: style_Population_3_0,
+        });
+        bounds_group.addLayer(layer_Population_3);
+        map.addLayer(layer_Population_3);
+        function pop_Numberofcrime_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">WARD_NAME</th>\
+                        <td class="visible-with-data" id="WARD_NAME">' + (feature.properties['WARD_NAME'] !== null ? autolinker.link(String(feature.properties['WARD_NAME']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Total_Pop</th>\
+                        <td class="visible-with-data" id="Total_Pop">' + (feature.properties['Total_Pop'] !== null ? autolinker.link(String(feature.properties['Total_Pop']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">No_crime</th>\
+                        <td class="visible-with-data" id="No_crime">' + (feature.properties['No_crime'] !== null ? autolinker.link(String(feature.properties['No_crime']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Numberofcrime_4_0(feature) {
+            if (feature.properties['No_crime'] >= 0.000000 && feature.properties['No_crime'] <= 1.000000 ) {
+                return {
+                pane: 'pane_Numberofcrime_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,245,240,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['No_crime'] >= 1.000000 && feature.properties['No_crime'] <= 5.000000 ) {
+                return {
+                pane: 'pane_Numberofcrime_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(253,190,165,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['No_crime'] >= 5.000000 && feature.properties['No_crime'] <= 10.000000 ) {
+                return {
+                pane: 'pane_Numberofcrime_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(252,112,80,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['No_crime'] >= 10.000000 && feature.properties['No_crime'] <= 39.000000 ) {
+                return {
+                pane: 'pane_Numberofcrime_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(246,83,59,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['No_crime'] >= 39.000000 && feature.properties['No_crime'] <= 291.000000 ) {
+                return {
+                pane: 'pane_Numberofcrime_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,26,28,1.0)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_Numberofcrime_4');
+        map.getPane('pane_Numberofcrime_4').style.zIndex = 404;
+        map.getPane('pane_Numberofcrime_4').style['mix-blend-mode'] = 'normal';
+        var layer_Numberofcrime_4 = new L.geoJson(json_Numberofcrime_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Numberofcrime_4',
+            layerName: 'layer_Numberofcrime_4',
+            pane: 'pane_Numberofcrime_4',
+            onEachFeature: pop_Numberofcrime_4,
+            style: style_Numberofcrime_4_0,
+        });
+        bounds_group.addLayer(layer_Numberofcrime_4);
+        map.addLayer(layer_Numberofcrime_4);
+        function pop_Intersections_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">OWNRSHP</th>\
+                        <td class="visible-with-data" id="OWNRSHP">' + (feature.properties['OWNRSHP'] !== null ? autolinker.link(String(feature.properties['OWNRSHP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Intersections_5_0() {
+            return {
+                pane: 'pane_Intersections_5',
+                opacity: 1,
+                color: 'rgba(54,5,5,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Intersections_5');
+        map.getPane('pane_Intersections_5').style.zIndex = 405;
+        map.getPane('pane_Intersections_5').style['mix-blend-mode'] = 'normal';
+        var layer_Intersections_5 = new L.geoJson(json_Intersections_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Intersections_5',
+            layerName: 'layer_Intersections_5',
+            pane: 'pane_Intersections_5',
+            onEachFeature: pop_Intersections_5,
+            style: style_Intersections_5_0,
+        });
+        bounds_group.addLayer(layer_Intersections_5);
+        map.addLayer(layer_Intersections_5);
+        function pop_CPbuildingoffices_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">NAME</th>\
+                        <td class="visible-with-data" id="NAME">' + (feature.properties['NAME'] !== null ? autolinker.link(String(feature.properties['NAME']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Open_Data_'] !== null ? autolinker.link(String(feature.properties['Open_Data_']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['F2'] !== null ? autolinker.link(String(feature.properties['F2']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['F3'] !== null ? autolinker.link(String(feature.properties['F3']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ObjectID_1'] !== null ? autolinker.link(String(feature.properties['ObjectID_1']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_CPbuildingoffices_6_0() {
+            return {
+                pane: 'pane_CPbuildingoffices_6',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(178,223,138,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_CPbuildingoffices_6');
+        map.getPane('pane_CPbuildingoffices_6').style.zIndex = 406;
+        map.getPane('pane_CPbuildingoffices_6').style['mix-blend-mode'] = 'normal';
+        var layer_CPbuildingoffices_6 = new L.geoJson(json_CPbuildingoffices_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_CPbuildingoffices_6',
+            layerName: 'layer_CPbuildingoffices_6',
+            pane: 'pane_CPbuildingoffices_6',
+            onEachFeature: pop_CPbuildingoffices_6,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_CPbuildingoffices_6_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_CPbuildingoffices_6);
+        map.addLayer(layer_CPbuildingoffices_6);
+        function pop_Crimefocus_7(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">id</th>\
+                        <td class="visible-with-data" id="id">' + (feature.properties['id'] !== null ? autolinker.link(String(feature.properties['id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">wards</th>\
+                        <td class="visible-with-data" id="wards">' + (feature.properties['wards'] !== null ? autolinker.link(String(feature.properties['wards']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">No_Crime</th>\
+                        <td class="visible-with-data" id="No_Crime">' + (feature.properties['No_Crime'] !== null ? autolinker.link(String(feature.properties['No_Crime']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Crime_Pop</th>\
+                        <td class="visible-with-data" id="Crime_Pop">' + (feature.properties['Crime_Pop'] !== null ? autolinker.link(String(feature.properties['Crime_Pop']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Crimefocus_7_0() {
+            return {
+                pane: 'pane_Crimefocus_7',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Crimefocus_7');
+        map.getPane('pane_Crimefocus_7').style.zIndex = 407;
+        map.getPane('pane_Crimefocus_7').style['mix-blend-mode'] = 'normal';
+        var layer_Crimefocus_7 = new L.geoJson(json_Crimefocus_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Crimefocus_7',
+            layerName: 'layer_Crimefocus_7',
+            pane: 'pane_Crimefocus_7',
+            onEachFeature: pop_Crimefocus_7,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Crimefocus_7_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Crimefocus_7);
+        map.addLayer(layer_Crimefocus_7);
+        var overlaysTree = [
+            {label: '<img src="legend/Crimefocus_7.png" /> Crime focus', layer: layer_Crimefocus_7},
+            {label: '<img src="legend/CPbuildingoffices_6.png" /> CP building offices', layer: layer_CPbuildingoffices_6},
+            {label: '<img src="legend/Intersections_5.png" /> Intersections', layer: layer_Intersections_5},
+            {label: 'Number of crime<br /><table><tr><td style="text-align: center;"><img src="legend/Numberofcrime_4_010.png" /></td><td>0 - 1</td></tr><tr><td style="text-align: center;"><img src="legend/Numberofcrime_4_151.png" /></td><td>1 - 5</td></tr><tr><td style="text-align: center;"><img src="legend/Numberofcrime_4_5102.png" /></td><td>5 - 10</td></tr><tr><td style="text-align: center;"><img src="legend/Numberofcrime_4_10393.png" /></td><td>10 - 39</td></tr><tr><td style="text-align: center;"><img src="legend/Numberofcrime_4_392914.png" /></td><td>39 - 291</td></tr></table>', layer: layer_Numberofcrime_4},
+            {label: 'Population<br /><table><tr><td style="text-align: center;"><img src="legend/Population_3_01000.png" /></td><td>0 - 100</td></tr><tr><td style="text-align: center;"><img src="legend/Population_3_1005741.png" /></td><td>100 - 574</td></tr><tr><td style="text-align: center;"><img src="legend/Population_3_57411442.png" /></td><td>574 - 1144</td></tr><tr><td style="text-align: center;"><img src="legend/Population_3_114443503.png" /></td><td>1144 - 4350</td></tr><tr><td style="text-align: center;"><img src="legend/Population_3_4350322594.png" /></td><td>4350 - 32259</td></tr></table>', layer: layer_Population_3},
+            {label: '<img src="legend/coct_2.png" /> coct', layer: layer_coct_2},
+            {label: '<img src="legend/Wards_1.png" /> Wards', layer: layer_Wards_1},
+            {label: "OpenStreetMap", layer: layer_OpenStreetMap_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: false, 
+        });
+        lay.addTo(map);
+		document.addEventListener("DOMContentLoaded", function() {
+            // set new Layers List height which considers toggle icon
+            function newLayersListHeight() {
+                var layerScrollbarElement = document.querySelector('.leaflet-control-layers-scrollbar');
+                if (layerScrollbarElement) {
+                    var layersListElement = document.querySelector('.leaflet-control-layers-list');
+                    var originalHeight = layersListElement.style.height 
+                        || window.getComputedStyle(layersListElement).height;
+                    var newHeight = parseFloat(originalHeight) - 50;
+                    layersListElement.style.height = newHeight + 'px';
+                }
+            }
+            var isLayersListExpanded = true;
+            var controlLayersElement = document.querySelector('.leaflet-control-layers');
+            var toggleLayerControl = document.querySelector('.leaflet-control-layers-toggle');
+            // toggle Collapsed/Expanded and apply new Layers List height
+            toggleLayerControl.addEventListener('click', function() {
+                if (isLayersListExpanded) {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                } else {
+                    controlLayersElement.classList.add('leaflet-control-layers-expanded');
+                }
+                isLayersListExpanded = !isLayersListExpanded;
+                newLayersListHeight()
+            });	
+			// apply new Layers List height if toggle layerstree
+			if (controlLayersElement) {
+				controlLayersElement.addEventListener('click', function(event) {
+					var toggleLayerHeaderPointer = event.target.closest('.leaflet-layerstree-header-pointer span');
+					if (toggleLayerHeaderPointer) {
+						newLayersListHeight();
+					}
+				});
+			}
+            // Collapsed/Expanded at Start to apply new height
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            // Collapsed touch/small screen
+            var isSmallScreen = window.innerWidth < 650;
+            if (isSmallScreen) {
+                setTimeout(function() {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                    isLayersListExpanded = !isLayersListExpanded;
+                }, 500);
+            }  
+        });       
+        setBounds();
+        </script>
+    </body>
+</html>
